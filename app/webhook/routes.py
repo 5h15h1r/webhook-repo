@@ -24,30 +24,29 @@ def receiver():
             return jsonify({'message': 'Push event ignored (merge commit)'}), 200
 
         event_data = {
-            "type": "push",
+            "action": "push",
             "author": author,
             "to_branch": to_branch,
             "timestamp": timestamp,
         }
     
     elif event_type == 'pull_request':
-        action = data['action']  
+        typeof = data['action']  
         author = data['pull_request']['user']['login']
         from_branch = data['pull_request']['head']['ref']
         to_branch = data['pull_request']['base']['ref']
         created_timestamp = datetime.fromisoformat(data['pull_request']['created_at'])
         
         event_data = {
-            "type": "pull_request",
-            "action": action,
+            "action": "pull_request",
             "author": author,
             "from_branch": from_branch,
             "to_branch": to_branch,
             "timestamp": created_timestamp
         }
         
-        if action == 'closed' and data['pull_request']['merged']:
-            event_data["type"] = "merge"
+        if typeof == 'closed' and data['pull_request']['merged']:
+            event_data["action"] = "merge"
             event_data["merged_by"] = data['pull_request']['merged_by']['login']
             
     else:
@@ -55,6 +54,7 @@ def receiver():
 
     collection.insert_one(event_data)
     return jsonify({'message': 'Event received'}), 200
+
 @webhook.route('/events', methods=['GET'])
 @cross_origin()
 def get_events():
