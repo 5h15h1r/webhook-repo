@@ -4,13 +4,19 @@ import axios from 'axios';
 
 const App = () => {
   const [events, setEvents] = useState([]);
+  const [lastFetchedEventId, setLastFetchedEventId] = useState(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const response = await axios.get('https://webhook-repo-dnop.onrender.com/webhook/events');
-        setEvents(response.data);
-        console.log(response.data);
+        const newEvents = response.data;
+
+        // Check for new events by comparing the first event's ID with the last fetched event's ID
+        if (newEvents.length > 0 && newEvents[0]._id !== lastFetchedEventId) {
+          setEvents(newEvents.slice(0, 1)); // Only display the newest event
+          setLastFetchedEventId(newEvents[0]._id); // Update the last fetched event ID
+        }
       } catch (error) {
         console.error('Error fetching events', error);
       }
@@ -19,7 +25,7 @@ const App = () => {
     fetchEvents();
     const interval = setInterval(fetchEvents, 15000);
     return () => clearInterval(interval);
-  }, []);
+  }, [lastFetchedEventId]);
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-5">
@@ -48,6 +54,9 @@ const App = () => {
                   <span className="text-gray-500">{new Date(event.timestamp).toLocaleString()}</span>
                 </span>
               )}
+              <div className="text-gray-500 text-sm mt-2">
+                Request ID: <span className="font-medium">{event.request_id}</span>
+              </div>
             </li>
           ))}
         </ul>
