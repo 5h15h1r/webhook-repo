@@ -7,21 +7,18 @@ app = Flask(__name__)
 # Define the blueprint for webhook
 webhook = Blueprint('Webhook', __name__, url_prefix='/webhook')
 
-@webhook.route('/')
-def hello():
-    return 'hello'
-
 @webhook.route('/receiver', methods=["POST"])
 def receiver():
     data = request.json
     event_type = request.headers.get('X-GitHub-Event')
+    print(data)
     
     if event_type == 'push':
         author = data['pusher']['name']
         to_branch = data['ref'].split('/')[-1]
         timestamp = datetime.fromisoformat(data['head_commit']['timestamp'])
         event_data = {
-            "type": "push",
+            "action": "push",
             "author": author,
             "to_branch": to_branch,
             "timestamp": timestamp,
