@@ -19,7 +19,7 @@ def receiver():
     if event_type == 'push':
         author = data['pusher']['name']
         to_branch = data['ref'].split('/')[-1]
-        timestamp = datetime.strptime(data['head_commit']['timestamp'], "%Y-%m-%dT%H:%M:%SZ")
+        timestamp = datetime.fromisoformat(data['head_commit']['timestamp'])
         event_data = {
             "type": "push",
             "author": author,
@@ -30,7 +30,7 @@ def receiver():
         author = data['pull_request']['user']['login']
         from_branch = data['pull_request']['head']['ref']
         to_branch = data['pull_request']['base']['ref']
-        timestamp = datetime.strptime(data['pull_request']['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+        timestamp = datetime.fromisoformat(data['pull_request']['created_at'])
         event_data = {
             "type": "pull_request",
             "author": author,
@@ -42,7 +42,7 @@ def receiver():
         author = data['pull_request']['user']['login']
         from_branch = data['pull_request']['head']['ref']
         to_branch = data['pull_request']['base']['ref']
-        timestamp = datetime.strptime(data['pull_request']['merged_at'], "%Y-%m-%dT%H:%M:%SZ")
+        timestamp = datetime.fromisoformat(data['pull_request']['merged_at'])
         event_data = {
             "type": "merge",
             "author": author,
