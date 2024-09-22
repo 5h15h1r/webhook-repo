@@ -19,37 +19,41 @@ def receiver():
     if event_type == 'push':
         author = data['pusher']['name']
         to_branch = data['ref'].split('/')[-1]
-        timestamp = datetime.strptime(data['head_commit']['timestamp'], "%Y-%m-%dT%H:%M:%S%z")
+        timestamp = datetime.fromisoformat(data['head_commit']['timestamp'])
         event_data = {
             "type": "push",
             "author": author,
             "to_branch": to_branch,
-            "timestamp": timestamp
+            "timestamp": timestamp,
+            "commits": data['commits']  # Optional: capture commits
         }
+    
+    # Handle pull request events (including merge)
     elif event_type == 'pull_request':
+        action = data['action']  # Check the action on the pull request
         author = data['pull_request']['user']['login']
         from_branch = data['pull_request']['head']['ref']
         to_branch = data['pull_request']['base']['ref']
-        timestamp = datetime.strptime(data['pull_request']['created_at'], "%Y-%m-%dT%H:%M:%S%z")
+        created_timestamp = datetime.fromisoformat(data['pull_request']['created_at'])
+        
+        # For all pull requests, store basic PR data
         event_data = {
             "type": "pull_request",
+            "action": action,
             "author": author,
             "from_branch": from_branch,
             "to_branch": to_branch,
-            "timestamp": timestamp
+            "timestamp": created_timestamp
         }
-    elif event_type == 'pull_request' and data['pull_request']['merged']:
-        author = data['pull_request']['user']['login']
-        from_branch = data['pull_request']['head']['ref']
-        to_branch = data['pull_request']['base']['ref']
-        timestamp = datetime.strptime(data['pull_request']['merged_at'], "%Y-%m-%dT%H:%M:%S%z")
-        event_data = {
-            "type": "merge",
-            "author": author,
-            "from_branch": from_branch,
-            "to_branch": to_branch,
-            "timestamp": timestamp
-        }
+        
+        # If the PR was closed and merged, capture additional merge data
+        if action == 'closed' and data['pull_request']['merged']:
+            merged_timestamp = datetime.fromisoformat(data['pull_request']['merged_at'])
+            event_data["type"] = "merge"
+            event_data["merged_by"] = data['pull_request']['merged_by']['login']
+            event_data["merged_at"] = merged_timestamp
+            event_data["commits"] = data.get('commits', [])  # Optional: capture merge commits
+    
     else:
         return jsonify({'message': 'Event not supported'}), 400
 
