@@ -38,7 +38,7 @@ def receiver():
         created_timestamp = datetime.fromisoformat(data['pull_request']['created_at'])
         
         event_data = {
-            "action": "pull_request",
+            "action": "pull",
             "author": author,
             "from_branch": from_branch,
             "to_branch": to_branch,
