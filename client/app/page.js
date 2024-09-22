@@ -10,6 +10,7 @@ const App = () => {
       try {
         const response = await axios.get('https://webhook-repo-dnop.onrender.com/webhook/events');
         setEvents(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error('Error fetching events', error);
       }
