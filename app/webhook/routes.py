@@ -5,7 +5,7 @@ from flask_cors import CORS
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000/"}})
 
 webhook = Blueprint('Webhook', __name__, url_prefix='/webhook')
 
