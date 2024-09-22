@@ -53,11 +53,9 @@ def receiver():
         
         # If the PR was closed and merged, capture additional merge data
         if action == 'closed' and data['pull_request']['merged']:
-            merged_timestamp = datetime.fromisoformat(data['pull_request']['merged_at'])
             event_data["type"] = "merge"
             event_data["merged_by"] = data['pull_request']['merged_by']['login']
-            event_data["merged_at"] = merged_timestamp
-    
+            
     else:
         return jsonify({'message': 'Event not supported'}), 400
 
