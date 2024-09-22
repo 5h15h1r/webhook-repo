@@ -7,6 +7,10 @@ app = Flask(__name__)
 # Define the blueprint for webhook
 webhook = Blueprint('Webhook', __name__, url_prefix='/webhook')
 
+@webhook.route('/')
+def hello():
+    return 'hello'
+
 @webhook.route('/receiver', methods=["POST"])
 def receiver():
     data = request.json
@@ -59,7 +63,6 @@ def get_events():
         event['_id'] = str(event['_id'])
     return jsonify(events), 200
 
-# Register the blueprint
 app.register_blueprint(webhook)
 
 if __name__ == '__main__':
