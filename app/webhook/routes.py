@@ -1,6 +1,7 @@
 from flask import Flask, Blueprint, request, jsonify
 from datetime import datetime
 from app.extensions import collection
+import logging
 
 app = Flask(__name__)
 
@@ -11,7 +12,7 @@ webhook = Blueprint('Webhook', __name__, url_prefix='/webhook')
 def receiver():
     data = request.json
     event_type = request.headers.get('X-GitHub-Event')
-    print(data)
+    logging.log(data)
     
     if event_type == 'push':
         author = data['pusher']['name']
