@@ -1,7 +1,7 @@
 from flask import Flask, Blueprint, request, jsonify
 from datetime import datetime
 from app.extensions import collection
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 
 
 app = Flask(__name__)
@@ -56,6 +56,7 @@ def receiver():
     collection.insert_one(event_data)
     return jsonify({'message': 'Event received'}), 200
 @webhook.route('/events', methods=['GET'])
+@cross_origin()
 def get_events():
     events = list(collection.find().sort("timestamp", -1).limit(10))
     for event in events:
