@@ -12,7 +12,7 @@ webhook = Blueprint('Webhook', __name__, url_prefix='/webhook')
 def receiver():
     data = request.json
     event_type = request.headers.get('X-GitHub-Event')
-    logging.log(data)
+    logging.log(data,msg="log")
     
     if event_type == 'push':
         author = data['pusher']['name']
