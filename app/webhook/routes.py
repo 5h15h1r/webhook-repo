@@ -25,18 +25,15 @@ def receiver():
             "author": author,
             "to_branch": to_branch,
             "timestamp": timestamp,
-            "commits": data['commits']  # Optional: capture commits
         }
     
-    # Handle pull request events (including merge)
     elif event_type == 'pull_request':
-        action = data['action']  # Check the action on the pull request
+        action = data['action']  
         author = data['pull_request']['user']['login']
         from_branch = data['pull_request']['head']['ref']
         to_branch = data['pull_request']['base']['ref']
         created_timestamp = datetime.fromisoformat(data['pull_request']['created_at'])
         
-        # For all pull requests, store basic PR data
         event_data = {
             "type": "pull_request",
             "action": action,
@@ -46,13 +43,11 @@ def receiver():
             "timestamp": created_timestamp
         }
         
-        # If the PR was closed and merged, capture additional merge data
         if action == 'closed' and data['pull_request']['merged']:
             merged_timestamp = datetime.fromisoformat(data['pull_request']['merged_at'])
             event_data["type"] = "merge"
             event_data["merged_by"] = data['pull_request']['merged_by']['login']
             event_data["merged_at"] = merged_timestamp
-            event_data["commits"] = data.get('commits', [])  # Optional: capture merge commits
     
     else:
         return jsonify({'message': 'Event not supported'}), 400
